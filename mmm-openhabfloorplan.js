@@ -25,9 +25,9 @@ Module.register("mmm-openhabfloorplan", {
 			defaultSize: "medium", // value of font-size style, e.g. xx-small, x-small, small, medium, large, x-large, xx-large, 1.2em, 20px
 			updateInterval: 30, // every 5 min, 0 to disable labels
 		},
-		lights: [ // list all light items to be shown (must be of openhab type Switch or Dimmer), e.g.:
+		lights: { // list all light items to be shown (must be of openhab type Switch or Dimmer), e.g.:
 			// L_Kitchen: { left: 110, top: 80 },
-		],
+		},
 		windows: [ // list all window / door contacts to be shown (must be of openhab type Switch or Contact), e.g.:
 			// { left: 613, top: 196, width: 26, height: 35, openhabItem: "Reed_dachbodenluke" },
 		],
@@ -50,12 +50,12 @@ Module.register("mmm-openhabfloorplan", {
 			Log.info("Openhab items received: " + payload.item.length);
 			for (var key in payload.item) {
 				var item = payload.item[key];
-				if (item.name in config.lights) {
-					var visible = item.state == "ON" || (typeof item.state == "number" && Number(item.state) > 0);
-					setVisible("openhab_" + item.name, visible);
-				} else if (item.name in config.windows) {
+				if (item.name in this.config.lights) {
+					var visible = item.state == "ON" || (!isNaN(parseInt(item.state)) && parseInt(item.state) > 0);
+					this.setVisible("openhab_" + item.name, visible);
+//				} else if (item.name in config.windows) {
 
-				} else if (item.name in config.labels) {
+//				} else if (item.name in config.labels) {
 
 				}
 			}

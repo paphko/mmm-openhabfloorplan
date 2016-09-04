@@ -2,7 +2,7 @@ var request = require('request');
 var NodeHelper = require("node_helper");
 
 module.exports = NodeHelper.create({
-	
+
 	start: function() {
 		var self = this;
 		console.log("Starting node helper: " + this.name);
@@ -28,11 +28,12 @@ module.exports = NodeHelper.create({
 		var self = this;
 
 		// continue only if it is a get request for an openhab group
-		if ((typeof notification === 'string' || notification instanceof String) && notification.startsWith("GET_OPENHAB_ITEMS")) {
+		if (notification == "GET_OPENHAB_ITEMS") {
 
 			// build request params: url and optionally basic authentication
 			var requestParams = this.buildRequestParams(openhab);
 
+			console.log("Requesting items on openhab server: " + requestParams);
 			request(requestParams, function(error, response, body) {
 				if (!error && response.statusCode == 200) {
 					self.sendSocketNotification("OPENHAB_ITEMS", JSON.parse(body));
