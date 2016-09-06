@@ -1,5 +1,5 @@
-# Magic Mirror Module: mmm-weatherchart
-This [MagicMirror2](https://github.com/MichMich/MagicMirror) module allows you to show a weather diagram provided by http://www.yr.no
+# Magic Mirror Module: mmm-openhabfloorplan
+This [MagicMirror2](https://github.com/MichMich/MagicMirror) module allows you to show a floorplan of your house / apartment with the current state of lights, window contacts, and labels provided by a running [openhab](http://www.openhab.org/) server (only version 1.x tested so far). Unlike most other modules, the data can be pushed from the openhab server via the [http binding](https://github.com/openhab/openhab/wiki/Http-Binding) to the magic mirror, so state changes are immediately shown.
 
 Example is shown in the pictures of this [blog post](https://paphko.blogspot.de/2016/01/magic-mirror-openhab.html).
 
@@ -12,74 +12,35 @@ cd ~/MagicMirror/modules
 
 Clone this repository:
 ````
-git clone https://github.com/paphko/mmm-weatherchart.git
+git clone https://github.com/paphko/mmm-openhabfloorplan.git
 ````
-
-Configure the module in your `config.js` file.
 
 ## Using the module
 
-To use this module, you must first determine country, area, and city:
+First of all, you should create an image showing your individual floorplan.
+You can use `mmm-openhabfloorplan/images/floorplan-default.png` as template and use an image editor like [paint.net](http://www.getpaint.net/index.html) to change it as you like. Save it as `mmm-openhabfloorplan/images/floorplan.png`.
 
-1. go to http://www.yr.no
-2. enter your location into the search field at the top and select your city
-3. at the top-right, switch language to English
-4. write down country, area, and city from the current URL, e.g.: http://www.yr.no/place/Germany/North_Rhine-Westphalia/Duisburg/
-
-Now add the module to the modules array in the `config/config.js` file:
+Now add the module to the modules array in the `config/config.js` file.
+Yes, the configuration looks complicated, but there is quite a lot that can be configured.
+The in-line comments should explain everything you need to know, so copy this sample configuration and adjust it to your individual openhab server, openhab items, and your floorplan.
 ````javascript
 modules: [
 	{
-		module: 'mmm-weatherchart',
+		module: 'mmm-openhabfloorplan',
 		position: 'bottom_left', // this can be any of the regions
 		config: {
-			country: 'Germany', // as determined above
-			area: 'North_Rhine-Westphalia', // as determined above
-			city: 'Duisburg', // as determined above
-			updateInterval: 60 * 60 * 1000, // update every hour
-			hideBorder: true, // whether or not a border with city name should be shown
+			TODO
 		}
 	},
 ]
 ````
 
-## Configuration options
+## Configuring Openhab
 
-The following properties can be configured:
+All openhab items that are configured in your module may also push their state changes directly to this magic mirror module via the [http binding](https://github.com/openhab/openhab/wiki/Http-Binding). The examples below should be self-explanatory:
 
-
-<table width="100%">
-	<!-- why, markdown... -->
-	<thead>
-		<tr>
-			<th>Option</th>
-			<th width="100%">Description</th>
-		</tr>
-	<thead>
-	<tbody>
-		<tr>
-			<td><code>country</code></td>
-			<td>Your country as determined above</td>
-		</tr>
-		<tr>
-			<td><code>area</code></td>
-			<td>Your area as determined above</td>
-		</tr>
-		<tr>
-			<td><code>city</code></td>
-			<td>Your city name as determined above</td>
-		</tr>
-		<tr>
-			<td><code>updateInterval</code></td>
-			<td>Update interval of the diagram.
-				<br><b>Default value:</b> <code>60 * 60 * 1000</code> (once every hour)
-			</td>
-		</tr>
-		<tr>
-			<td><code>hideBorder</code></td>
-			<td>Wheather or not a border with city name should be shown.
-				<br><b>Default value:</b> <code>true</code>
-			</td>
-		</tr>
-	</tbody>
-</table>
+````
+Switch Light_Kitchen TODO...
+Switch Reed_Kitchen TODO...
+String Temperature_Kitchen TODO...
+````
