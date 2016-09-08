@@ -3,7 +3,7 @@ Module.register("mmm-openhabfloorplan", {
 		/* with the openhab http binding, all changes can directly be pushed to the mirror. */
 		/* please see documentation of this module how this works. */
 		updateInterval: 60 * 60 * 1000, // refreshing all windows / lights / labels once per hour; 0 to disable periodic update
-		showAll: false, // if true, all lights and windows are shown; if false, they are only shown if openhab item is available
+		draft: false, // if true, all lights and windows and the label names are shown; if false, get states from openhab
 		openhab: {
 			url: "http://openhab:8080", // must not have trailing slash!
 			user: "",
@@ -41,17 +41,20 @@ Module.register("mmm-openhabfloorplan", {
 			// Reed_Livingroom_Window: { left: 50, top: 50, radius: 25, midPoint: "top-left", counterwindow: "horizontal" }, // wing with counterwindow
 		},
 		labels: {
-			/* list all strings to be shown (must be of openhab type String), examples below. */
-			// Temperature_Kitchen: { left: 613, top: 215 }, // label with default color and size
-			// Temperature_Livingroom: { left: 613, top: 215, color: "white", size: "x-small" }, // small and white label
+			/* list all strings to be shown (resonable for openhab types String and Number), examples below. */
+			// Temperature_Kitchen: { left: 100, top: 50 }, // label with default color and size
+			// Temperature_Livingroom: { left: 200, top: 50, color: "white", size: "x-small" }, // small and white label
+			// Temperature_Front_Door: { left: 300, top: 50, color: "white", decimals: 2 }, // small and show two decimal places of float value
+			// Temperature_Back_Door: { left: 400, top: 50, prefix: "outside: ", postfix: "°C" }, // label with prefix and postfix
 		},
         },
 
 	start: function() {
 		Log.info("Starting module: " + this.name);
 
-		// request item states if at least one item has been configured
-		if (this.valuesExist(this.config.windows) || this.valuesExist(this.config.lights) || this.valuesExist(this.config.labels)) {
+		if (this.config.draft) {
+			Log.info("openhab items are not loaded because module is in draft mode");
+		} else if (this.valuesExist(this.config.windows) || this.valuesExist(this.config.lights) || this.valuesExist(this.config.labels)) {
 			Log.info("Requesting initial item states...");
 			this.sendSocketNotification("GET_OPENHAB_ITEMS", this.config.openhab); // request initial item states
 
@@ -85,7 +88,7 @@ Module.register("mmm-openhabfloorplan", {
 				} else if (item.name in this.config.labels) {
 					var element = document.getElementById("openhab_" + item.name);
 					if (element != null) {
-						element.innerHTML = item.state;
+						element.innerHTML = this.formatLabel(item.state, this.config.labels[item.name]);
 					}
 				}
 			}
@@ -96,6 +99,13 @@ Module.register("mmm-openhabfloorplan", {
 		if (element != null) {
 			element.style.display = value ? "block" : "none";
 		}
+	},
+	formatLabel: function(value, config) {
+		var formattedValue = value;
+		if (!isNaN(config.decimals) && !isNaN(value)) {
+			formattedValue = parseFloat(value).toFixed(config.decimals);
+		}
+		return (typeof config.prefix !== 'undefined' ? config.prefix : "") + formattedValue + (typeof config.postfix !== 'undefined' ? config.postfix : "");
 	},
 
         getDom: function() {
@@ -118,7 +128,7 @@ Module.register("mmm-openhabfloorplan", {
 		// set style: location
 		var style = "margin-left:" + position.left + "px;margin-top:" + position.top + "px;position:absolute;"
 			+ "height:" + this.config.light.height + "px;width:" + this.config.light.width + "px;";
-		if (!this.config.showAll)
+		if (!this.config.draft)
 			style += "display:none;"; // hide by default, do not hide if all items should be shown
 
 		// create div, set style and text
@@ -187,7 +197,7 @@ Module.register("mmm-openhabfloorplan", {
 
 		// prepare style with location and hide it!
 		var style = "margin-left:" + windowConfig.left + "px;margin-top:" + windowConfig.top + "px;position:absolute;";
-		if (!this.config.showAll)
+		if (!this.config.draft)
 			style += "display:none;"; // hide by default, do not hide if all items should be shown
 
 		// if radius is set, it's a wing with a radius
