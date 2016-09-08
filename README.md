@@ -23,6 +23,7 @@ You can use `mmm-openhabfloorplan/images/floorplan-default.png` as template and 
 Now add the module to the modules array in the `config/config.js` file.
 Yes, the configuration looks complicated, but there is quite a lot that can be configured.
 The in-line comments should explain everything you need to know, so copy this sample configuration and adjust it to your individual openhab server, openhab items, and your floorplan.
+When you are done adding all items and positioning them as you like, change `draft` to false.
 ````javascript
 modules: [
 	{
