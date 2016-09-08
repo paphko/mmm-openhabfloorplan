@@ -34,8 +34,8 @@ modules: [
 			draft: true, // if true, all lights, windows, and label names are shown; if false, get states from openhab
 			openhab: {
 				url: "http://openhab:8080", // must not have a trailing slash!
-				user: "", // optional
-				password: "", // optional
+				// user: "", // only if you have authentication enabled
+				// password: "", // only if you have authentication enabled
 			},
 			floorplan: {
 				image: "floorplan-default.png", // image in subfolder 'images'; change to floorplan.png to avoid git repository changes
