@@ -2,7 +2,7 @@
 This [MagicMirror2](https://github.com/MichMich/MagicMirror) module allows you to show a floorplan of your house / apartment with the current state of lights, window contacts, and labels provided by a running [openhab](http://www.openhab.org/) server (only version 1.x tested so far).
 Unlike most other modules, the data can be pushed from the openhab server via http requests to the magic mirror, so state changes are immediately shown.
 
-Example is shown in the pictures of this [blog post](https://paphko.blogspot.de/2016/01/magic-mirror-openhab.html).
+![Example floorplan](https://forum.magicmirror.builders/uploads/files/1473878353822-openhabfloorplan-running.png "Example floorplan")
 
 ## Installation
 
