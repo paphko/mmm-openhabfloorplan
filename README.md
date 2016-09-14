@@ -16,11 +16,13 @@ Clone this repository:
 git clone https://github.com/paphko/mmm-openhabfloorplan.git
 ````
 
-## Using the module
+## Preparing the Floorplan
 
 First of all, you should create an image showing your individual floorplan.
-You can use `mmm-openhabfloorplan/images/floorplan-default.png` as template and use an image editor like [paint.net](http://www.getpaint.net/index.html) to change it as you like.
+You can use `mmm-openhabfloorplan/images/floorplan-default.png` as template (shown [here](images/README.md)) and use an image editor like [paint.net](http://www.getpaint.net/index.html) to change it as you like.
 Save it as `mmm-openhabfloorplan/images/floorplan.png` (leave `floorplan-default.png` untouched).
+
+## Configuring the Module
 
 Now add the module to the modules array in the `config/config.js` file.
 Yes, the configuration looks complicated, but there is quite a lot that can be configured.
