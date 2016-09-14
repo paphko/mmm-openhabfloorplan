@@ -98,10 +98,15 @@ modules: [
 
 ## Configuring Openhab
 
-All openhab items that are configured in your module may also push their state changes directly to this magic mirror module via the [http binding](https://github.com/openhab/openhab/wiki/Http-Binding). The examples below should be self-explanatory:
+The easiest and least invasive way of configuring openhab to push state changes to the magic mirror server, is via a dedicated rules-file, e.g. `mirror.rules`:
 
 ````
-Switch Light_Kitchen TODO...
-Switch Reed_Kitchen TODO...
-String Temperature_Kitchen TODO...
+// define your magic mirror URL here; make sure that there is no trailing slash
+var String mirrorUrl = "http://mirror:8080/openhab"
+
+// whenever one of your items of interest changes, send a GET request to the magic mirror server
+rule "L_Living to mirror"          when Item L_Living         changed then sendHttpGetRequest(mirrorUrl + "?item=L_Living&state="          + L_Living.state)          end
+rule "Reed_Door to mirror"         when Item Reed_Door        changed then sendHttpGetRequest(mirrorUrl + "?item=Reed_Door&state="         + Reed_Door.state)         end
+rule "Temperature_Entry to mirror" when Item Temerature_Entry changed then sendHttpGetRequest(mirrorUrl + "?item=Temperature_Entry&state=" + Temperature_Entry.state) end
+...
 ````

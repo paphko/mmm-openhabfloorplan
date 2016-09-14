@@ -62,7 +62,8 @@ Module.register("mmm-openhabfloorplan", {
 			if (!isNaN(this.config.updateInterval) && this.config.updateInterval > 0) {
 	        	        var self = this;
                 		setInterval(function() {
-					this.sendSocketNotification("GET_OPENHAB_ITEMS", this.config.openhab);
+					Log.info("requesting periodic update: " + self.config.openhab);
+					self.sendSocketNotification("GET_OPENHAB_ITEMS", self.config.openhab);
 		                }, this.config.updateInterval);
 			}
 		} else {
@@ -72,25 +73,32 @@ Module.register("mmm-openhabfloorplan", {
 	valuesExist: function(obj) { return obj !== 'undefined' && Object.keys(obj).length > 0; },
 
 	socketNotificationReceived: function(notification, payload) {
+		Log.info("Notification received: " + notification);
 		if (notification == "OPENHAB_ITEMS") {
 			Log.info("Openhab items received: " + payload.item.length);
 			for (var key in payload.item) {
 				var item = payload.item[key];
-				if (item.name in this.config.lights) {
-					var visible = item.state == "ON" || (!isNaN(parseInt(item.state)) && parseInt(item.state) > 0);
-					this.setVisible("openhab_" + item.name, visible);
-				} else if (item.name in this.config.windows) {
-					var visible = item.state == "OFF" || item.state == "OPEN";
-					this.setVisible("openhab_" + item.name, visible);
-					if (this.config.windows[item.name].counterwindow !== 'undefined' && this.config.windows[item.name].radius !== 'undefined') {
-						this.setVisible("openhab_" + item.name + "_counterwindow", visible);
-					}
-				} else if (item.name in this.config.labels) {
-					var element = document.getElementById("openhab_" + item.name);
-					if (element != null) {
-						element.innerHTML = this.formatLabel(item.state, this.config.labels[item.name]);
-					}
-				}
+				this.updateDivForItem(item.name, item.state);
+			}
+		} else if (notification == "OPENHAB_ITEM") {
+			Log.info("Openhab item received: " + payload.item);
+			this.updateDivForItem(payload.item, payload.state);
+		}
+	},
+	updateDivForItem: function(item, state) {
+		if (item in this.config.lights) {
+			var visible = state == "ON" || (!isNaN(parseInt(state)) && parseInt(state) > 0);
+			this.setVisible("openhab_" + item, visible);
+		} else if (item in this.config.windows) {
+			var visible = state == "OFF" || state == "OPEN";
+			this.setVisible("openhab_" + item, visible);
+			if (this.config.windows[item].counterwindow !== 'undefined' && this.config.windows[item].radius !== 'undefined') {
+				this.setVisible("openhab_" + item + "_counterwindow", visible);
+			}
+		} else if (item in this.config.labels) {
+			var element = document.getElementById("openhab_" + item);
+			if (element != null) {
+				element.innerHTML = this.formatLabel(state, this.config.labels[item]);
 			}
 		}
 	},

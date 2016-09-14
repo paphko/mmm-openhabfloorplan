@@ -1,5 +1,6 @@
-var request = require('request');
-var NodeHelper = require("node_helper");
+const request = require("request");
+const NodeHelper = require("node_helper");
+const url = require("url");
 
 module.exports = NodeHelper.create({
 
@@ -10,16 +11,13 @@ module.exports = NodeHelper.create({
                 this.expressApp.get('/openhab', (req, res) => {
 
                         var query = url.parse(req.url, true).query;
-                        var message = query.message;
-                        var type = query.type;
+			var payload = { item: query.item, state: query.state, timestamp: new Date() };
 
-                        if (message == null){
-                                res.send({"status": "failed", "error": "No message given."});
-                        }
-                        else {
-                                var log = {"message": message, "timestamp": new Date()};
-                                res.send({"status": "success", "payload": log});
-//TODO                                self.sendSocketNotification("NEW_MESSAGE", message);
+                        if (query.item == null || query.state == null) {
+                                res.send({ status: "failed", error: "item and/or state is missing", payload: payload});
+                        } else {
+                                res.send({ status: "success", payload: payload });
+                                self.sendSocketNotification("OPENHAB_ITEM", payload);
                         }
                 });
         },
