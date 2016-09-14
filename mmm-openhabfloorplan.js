@@ -12,7 +12,7 @@ Module.register("mmm-openhabfloorplan", {
 		floorplan: {
 			/* store your image as 'floorplan.png' to avoid git repository changes. */
 			image: "floorplan-default.png", // located in subfolder 'images'
-			width: 800, // image width
+			width: 400, // image width
 			height: 333, // image height
 		},
 		light: {
@@ -29,23 +29,23 @@ Module.register("mmm-openhabfloorplan", {
 		},
 		lights: {
 			/* list all light items to be shown (must be of openhab type Switch or Dimmer), examples below. */
-			// Light_Kitchen: { left: 110, top: 80 }, // name must match openhab item name (case sensitive!)
+			// Light_Kitchen: { left: 50, top: 50 }, // name must match openhab item name (case sensitive!)
 		},
 		windows: {
 			/* list all window / door contacts to be shown (must be of openhab type Switch or Contact), examples below. */
 			/* name must match openhab item name (case sensitive!) */
 			/* Supported formats are rectangles, single wings, and wings with counterwindow. */
-			// Reed_Front_Door: { left: 213, top: 196, width: 26, height: 35 }, // rectengular drawing
-			// Reed_Back_Door: { left: 113, top: 196, width: 26, height: 35, color: "orange", }, // color may optionally be overwritten
+			// Reed_Front_Door: { left: 100, top: 20, width: 26, height: 35 }, // rectengular drawing
+			// Reed_Back_Door: { left: 100, top: 50, width: 26, height: 35, color: "orange", }, // color may optionally be overwritten
 			// Reed_Kitchen_Window: { left: 100, top: 100, radius: 30, midPoint: "top-left" }, // wing with specified radius and mid-point location
-			// Reed_Livingroom_Window: { left: 50, top: 50, radius: 25, midPoint: "top-left", counterwindow: "horizontal" }, // wing with counterwindow
+			// Reed_Livingroom_Window: { left: 100, top: 150, radius: 25, midPoint: "top-left", counterwindow: "horizontal" }, // wing with counterwindow
 		},
 		labels: {
 			/* list all strings to be shown (resonable for openhab types String and Number), examples below. */
-			// Temperature_Kitchen: { left: 100, top: 50 }, // label with default color and size
-			// Temperature_Livingroom: { left: 200, top: 50, color: "white", size: "x-small" }, // small and white label
-			// Temperature_Front_Door: { left: 300, top: 50, color: "white", decimals: 2 }, // small and show two decimal places of float value
-			// Temperature_Back_Door: { left: 400, top: 50, prefix: "outside: ", postfix: "°C" }, // label with prefix and postfix
+			// Temperature_Kitchen: { left: 200, top: 50 }, // label with default color and size
+			// Temperature_Livingroom: { left: 200, top: 100, color: "white", size: "x-small" }, // small and white label
+			// Temperature_Front_Door: { left: 200, top: 150, color: "white", decimals: 2 }, // small and show two decimal places of float value
+			// Temperature_Back_Door: { left: 200, top: 200, prefix: "outside: ", postfix: "°C" }, // label with prefix and postfix
 		},
         },
 
@@ -55,14 +55,14 @@ Module.register("mmm-openhabfloorplan", {
 		if (this.config.draft) {
 			Log.info("openhab items are not loaded because module is in draft mode");
 		} else if (this.valuesExist(this.config.windows) || this.valuesExist(this.config.lights) || this.valuesExist(this.config.labels)) {
-			Log.info("Requesting initial item states...");
+			// Log.info("Requesting initial item states...");
 			this.sendSocketNotification("GET_OPENHAB_ITEMS", this.config.openhab); // request initial item states
 
 			// schedule periodic refresh if configured
 			if (!isNaN(this.config.updateInterval) && this.config.updateInterval > 0) {
 	        	        var self = this;
                 		setInterval(function() {
-					Log.info("requesting periodic update: " + self.config.openhab);
+					// Log.info("requesting periodic update: " + self.config.openhab);
 					self.sendSocketNotification("GET_OPENHAB_ITEMS", self.config.openhab);
 		                }, this.config.updateInterval);
 			}
@@ -73,15 +73,15 @@ Module.register("mmm-openhabfloorplan", {
 	valuesExist: function(obj) { return obj !== 'undefined' && Object.keys(obj).length > 0; },
 
 	socketNotificationReceived: function(notification, payload) {
-		Log.info("Notification received: " + notification);
+		// Log.info("Notification received: " + notification);
 		if (notification == "OPENHAB_ITEMS") {
-			Log.info("Openhab items received: " + payload.item.length);
+			// Log.info("Openhab items received: " + payload.item.length);
 			for (var key in payload.item) {
 				var item = payload.item[key];
 				this.updateDivForItem(item.name, item.state);
 			}
 		} else if (notification == "OPENHAB_ITEM") {
-			Log.info("Openhab item received: " + payload.item);
+			// Log.info("Openhab item received: " + payload.item);
 			this.updateDivForItem(payload.item, payload.state);
 		}
 	},

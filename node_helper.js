@@ -16,22 +16,21 @@ module.exports = NodeHelper.create({
                         if (query.item == null || query.state == null) {
                                 res.send({ status: "failed", error: "item and/or state is missing", payload: payload});
                         } else {
-                                res.send({ status: "success", payload: payload });
                                 self.sendSocketNotification("OPENHAB_ITEM", payload);
+                                res.send({ status: "success", payload: payload });
                         }
                 });
         },
 	
 	socketNotificationReceived: function(notification, openhab) {
-		var self = this;
-
 		// continue only if it is a get request for an openhab group
 		if (notification == "GET_OPENHAB_ITEMS") {
 
 			// build request params: url and optionally basic authentication
 			var requestParams = this.buildRequestParams(openhab);
 
-			console.log("Requesting items on openhab server: " + requestParams);
+			var self = this;
+			// console.log("Requesting items on openhab server: " + requestParams);
 			request(requestParams, function(error, response, body) {
 				if (!error && response.statusCode == 200) {
 					self.sendSocketNotification("OPENHAB_ITEMS", JSON.parse(body));
@@ -45,7 +44,6 @@ module.exports = NodeHelper.create({
 	},
 
 	buildRequestParams: function(openhab) {
-
 		// build url of openhab server to get status of group items in json format
 		var url = openhab.url;
 		if (!url.endsWith('/'))
@@ -58,9 +56,7 @@ module.exports = NodeHelper.create({
 			var auth = "Basic " + new Buffer(openhab.user + ":" + openhab.password).toString("base64");
 
 			return { url: url, headers: { "Authorization" : auth } };
-
 		} else {
-
 			return { url: url };
 		}		
 	},

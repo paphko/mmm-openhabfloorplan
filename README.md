@@ -1,5 +1,6 @@
 # Magic Mirror Module: mmm-openhabfloorplan
-This [MagicMirror2](https://github.com/MichMich/MagicMirror) module allows you to show a floorplan of your house / apartment with the current state of lights, window contacts, and labels provided by a running [openhab](http://www.openhab.org/) server (only version 1.x tested so far). Unlike most other modules, the data can be pushed from the openhab server via the [http binding](https://github.com/openhab/openhab/wiki/Http-Binding) to the magic mirror, so state changes are immediately shown.
+This [MagicMirror2](https://github.com/MichMich/MagicMirror) module allows you to show a floorplan of your house / apartment with the current state of lights, window contacts, and labels provided by a running [openhab](http://www.openhab.org/) server (only version 1.x tested so far).
+Unlike most other modules, the data can be pushed from the openhab server via http requests to the magic mirror, so state changes are immediately shown.
 
 Example is shown in the pictures of this [blog post](https://paphko.blogspot.de/2016/01/magic-mirror-openhab.html).
 
@@ -18,7 +19,8 @@ git clone https://github.com/paphko/mmm-openhabfloorplan.git
 ## Using the module
 
 First of all, you should create an image showing your individual floorplan.
-You can use `mmm-openhabfloorplan/images/floorplan-default.png` as template and use an image editor like [paint.net](http://www.getpaint.net/index.html) to change it as you like. Save it as `mmm-openhabfloorplan/images/floorplan.png`.
+You can use `mmm-openhabfloorplan/images/floorplan-default.png` as template and use an image editor like [paint.net](http://www.getpaint.net/index.html) to change it as you like.
+Save it as `mmm-openhabfloorplan/images/floorplan.png` (leave `floorplan-default.png` untouched).
 
 Now add the module to the modules array in the `config/config.js` file.
 Yes, the configuration looks complicated, but there is quite a lot that can be configured.
@@ -55,7 +57,7 @@ modules: [
 			//	defaultSize: "medium", // value of font-size style, e.g. xx-small, small, medium, large, x-large, 1.2em, 20px
 			// },
 			lights: { // list all light items to be shown (must be of openhab type Switch or Dimmer)
-				// format: "openhab item (name is case-sensitive!): left, top"
+				// format: "openhab item (name is case-sensitive!): { left, top }"
 				L_Living:      { left: 80,  top: 110 },
 				L_Sleeping:    { left: 80,  top: 240 },
 				L_Garden:      { left: 310, top: 5 },
@@ -98,6 +100,9 @@ modules: [
 
 ## Configuring Openhab
 
+If you simply want to pull states with the update interval as configured above, you don't need to do any changes to your openhab configuration.
+But it is really impressive if state changes are immediately (with less than 1sec delay in my case) shown on the mirror!
+
 The easiest and least invasive way of configuring openhab to push state changes to the magic mirror server, is via a dedicated rules-file, e.g. `mirror.rules`:
 
 ````
@@ -108,5 +113,5 @@ var String mirrorUrl = "http://mirror:8080/openhab"
 rule "L_Living to mirror"          when Item L_Living         changed then sendHttpGetRequest(mirrorUrl + "?item=L_Living&state="          + L_Living.state)          end
 rule "Reed_Door to mirror"         when Item Reed_Door        changed then sendHttpGetRequest(mirrorUrl + "?item=Reed_Door&state="         + Reed_Door.state)         end
 rule "Temperature_Entry to mirror" when Item Temerature_Entry changed then sendHttpGetRequest(mirrorUrl + "?item=Temperature_Entry&state=" + Temperature_Entry.state) end
-...
+// etc. this is always the same pattern, independent of the item type
 ````
