@@ -40,6 +40,7 @@ modules: [
 				url: "http://openhab:8080", // must not have a trailing slash!
 				// user: "", // only if you have authentication enabled
 				// password: "", // only if you have authentication enabled
+				version: 2, // supported are versions 1 and 2
 			},
 			floorplan: {
 				image: "floorplan-default.png", // image in subfolder 'images'; change to floorplan.png to avoid git repository changes

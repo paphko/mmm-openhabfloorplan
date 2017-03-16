@@ -24,18 +24,19 @@ module.exports = NodeHelper.create({
 	
 	socketNotificationReceived: function(notification, openhab) {
 		// continue only if it is a get request for an openhab group
-		if (notification == "GET_OPENHAB_ITEMS") {
+		if (notification === "GET_OPENHAB_ITEMS") {
 
 			// build request params: url and optionally basic authentication
 			var requestParams = this.buildRequestParams(openhab);
 
 			var self = this;
-			// console.log("Requesting items on openhab server: " + requestParams);
+			// console.log("Requesting items on openhab server: " + JSON.stringify(requestParams));
 			request(requestParams, function(error, response, body) {
-				if (!error && response.statusCode == 200) {
+				// console.log("response received: " + JSON.stringify(response));
+				if (!error && response.statusCode === 200) {
 					self.sendSocketNotification("OPENHAB_ITEMS", JSON.parse(body));
 				} else {
-					console.log("Request on openhab server failed (" + response.statusCode + "): " + error);
+					console.log("Request on openhab server failed (" + JSON.stringify(response) + "): " + error);
 				}
 			});
 		} else {
@@ -48,7 +49,7 @@ module.exports = NodeHelper.create({
 		var url = openhab.url;
 		if (!url.endsWith('/'))
 			url += '/';
-		url += "rest/items?type=json";
+		url += "rest/items" + (openhab.version === 1 ? "?type=json" : "");
 
 		if (openhab.user && openhab.password) {
 

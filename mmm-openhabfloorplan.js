@@ -8,6 +8,7 @@ Module.register("mmm-openhabfloorplan", {
 			url: "http://openhab:8080", // must not have trailing slash!
 			user: "",
 			password: "",
+			version: 2,
 		},
 		floorplan: {
 			/* store your image as 'floorplan.png' to avoid git repository changes. */
@@ -75,9 +76,11 @@ Module.register("mmm-openhabfloorplan", {
 	socketNotificationReceived: function(notification, payload) {
 		// Log.info("Notification received: " + notification);
 		if (notification == "OPENHAB_ITEMS") {
-			// Log.info("Openhab items received: " + payload.item.length);
-			for (var key in payload.item) {
-				var item = payload.item[key];
+			// Log.info("Openhab items received: " + JSON.stringify(payload)); // this may be huge!
+			// OH 1 and 2 have different JSON structure
+			var items = this.config.openhab.version === 1 ? payload.item : payload;
+			for (var key in items) {
+				var item = items[key];
 				this.updateDivForItem(item.name, item.state);
 			}
 		} else if (notification == "OPENHAB_ITEM") {
