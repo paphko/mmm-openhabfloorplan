@@ -106,8 +106,16 @@ modules: [
 If you simply want to pull states with the update interval as configured above, you don't need to do any changes to your openhab configuration.
 But it is really impressive if state changes are immediately (with less than 1sec delay in my case) shown on the mirror!
 
-The easiest and least invasive way of configuring openhab to push state changes to the magic mirror server, is via a dedicated rules-file, e.g. `mirror.rules`:
+First, you must have to change MagicMirror config:
+````
+var config = {
+address: "192.168.0.11", // IP of your MM server, for listening on it's @
+port: 8080,
+ipWhitelist: ["127.0.0.1", "::ffff:127.0.0.1", "192.168.0.12", "::1"] // Add IP of your client, for listening since this @ ex:192.168.0.12 
+````
 
+
+The easiest and least invasive way of configuring openhab to push state changes to the magic mirror server, is via a dedicated rules-file, e.g. `mirror.rules`:
 ````
 // define your magic mirror URL here; make sure that there is no trailing slash
 var String mirrorUrl = "http://mirror:8080/openhab"
