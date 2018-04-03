@@ -121,7 +121,7 @@ Module.register("mmm-openhabfloorplan", {
 
         getDom: function() {
 		var floorplan = document.createElement("div");
-		floorplan.style.cssText = "background-image:url(" + this.file("/images/" + this.config.floorplan.image) + ");position:absolute;"
+		floorplan.style.cssText = "background-image:url(" + this.file("/images/" + this.config.floorplan.image) + ");"
 			+ "top:-" + this.config.floorplan.height + "px;width:" + this.config.floorplan.width + "px;height:" + this.config.floorplan.height + "px;";
 		this.appendWindows(floorplan);
 		this.appendLights(floorplan);
