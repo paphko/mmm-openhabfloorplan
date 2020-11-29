@@ -1,5 +1,5 @@
 Module.register("mmm-openhabfloorplan", {
-        defaults: {
+	defaults: {
 		/* with the openhab http binding, all changes can directly be pushed to the mirror. */
 		/* please see documentation of this module how this works. */
 		updateInterval: 60 * 60 * 1000, // refreshing all windows / lights / labels once per hour; 0 to disable periodic update
@@ -15,6 +15,11 @@ Module.register("mmm-openhabfloorplan", {
 			image: "floorplan-default.png", // located in subfolder 'images'
 			width: 400, // image width
 			height: 333, // image height
+		},
+		socket: {
+			image: "socket.png",
+			width: 20,
+			height: 20,
 		},
 		light: {
 			image: "light.png", // located in subfolder 'images'
@@ -32,6 +37,9 @@ Module.register("mmm-openhabfloorplan", {
 			/* list all light items to be shown (must be of openhab type Switch or Dimmer), examples below. */
 			// Light_Kitchen: { left: 50, top: 50 }, // name must match openhab item name (case sensitive!)
 		},
+		sockets: {
+			/* same as lights... */
+		},
 		windows: {
 			/* list all window / door contacts to be shown (must be of openhab type Switch or Contact), examples below. */
 			/* name must match openhab item name (case sensitive!) */
@@ -48,24 +56,24 @@ Module.register("mmm-openhabfloorplan", {
 			// Temperature_Front_Door: { left: 200, top: 150, color: "white", decimals: 2 }, // small and show two decimal places of float value
 			// Temperature_Back_Door: { left: 200, top: 200, prefix: "outside: ", postfix: "°C" }, // label with prefix and postfix
 		},
-        },
+	},
 
 	start: function() {
 		Log.info("Starting module: " + this.name);
 
 		if (this.config.draft) {
 			Log.info("openhab items are not loaded because module is in draft mode");
-		} else if (this.valuesExist(this.config.windows) || this.valuesExist(this.config.lights) || this.valuesExist(this.config.labels)) {
+		} else if (this.valuesExist(this.config.windows) || this.valuesExist(this.config.lights) || this.valuesExist(this.config.sockets) || this.valuesExist(this.config.labels)) {
 			// Log.info("Requesting initial item states...");
 			this.sendSocketNotification("GET_OPENHAB_ITEMS", this.config.openhab); // request initial item states
 
 			// schedule periodic refresh if configured
 			if (!isNaN(this.config.updateInterval) && this.config.updateInterval > 0) {
-	        	        var self = this;
-                		setInterval(function() {
+				var self = this;
+				setInterval(function() {
 					// Log.info("requesting periodic update: " + self.config.openhab);
 					self.sendSocketNotification("GET_OPENHAB_ITEMS", self.config.openhab);
-		                }, this.config.updateInterval);
+				}, this.config.updateInterval);
 			}
 		} else {
 			Log.info("No items configured.");
@@ -90,6 +98,9 @@ Module.register("mmm-openhabfloorplan", {
 	},
 	updateDivForItem: function(item, state) {
 		if (item in this.config.lights) {
+			var visible = state == "ON" || (!isNaN(parseInt(state)) && parseInt(state) > 0);
+			this.setVisible("openhab_" + item, visible);
+		} else if (item in this.config.sockets) {
 			var visible = state == "ON" || (!isNaN(parseInt(state)) && parseInt(state) > 0);
 			this.setVisible("openhab_" + item, visible);
 		} else if (item in this.config.windows) {
@@ -125,8 +136,9 @@ Module.register("mmm-openhabfloorplan", {
 			+ "top:-" + this.config.floorplan.height + "px;width:" + this.config.floorplan.width + "px;height:" + this.config.floorplan.height + "px;";
 		this.appendWindows(floorplan);
 		this.appendLights(floorplan);
+		this.appendSockets(floorplan);
 		this.appendLabels(floorplan);
-                return floorplan;
+		return floorplan;
 	},
 
 	appendLights: function(floorplan) {
@@ -149,6 +161,28 @@ Module.register("mmm-openhabfloorplan", {
 		lightDiv.innerHTML = "<img src='" + this.file("/images/" + this.config.light.image) + "' style='"
 			+ "height:" + this.config.light.height + "px;width:" + this.config.light.width + "px;'/>";
 		return lightDiv;
+	},
+
+	appendSockets: function(floorplan) {
+		for (var item in this.config.sockets) {
+			var position = this.config.sockets[item];
+			floorplan.appendChild(this.getSocketDiv(item, position));
+		}
+	},
+	getSocketDiv: function(item, position) {
+		// set style: location
+		var style = "margin-left:" + position.left + "px;margin-top:" + position.top + "px;position:absolute;"
+			+ "height:" + this.config.socket.height + "px;width:" + this.config.socket.width + "px;";
+		if (!this.config.draft)
+			style += "display:none;"; // hide by default, do not hide if all items should be shown
+
+		// create div, set style and text
+		var socketDiv = document.createElement("div");
+		socketDiv.id = 'openhab_' + item;
+		socketDiv.style.cssText = style;
+		socketDiv.innerHTML = "<img src='" + this.file("/images/" + this.config.socket.image) + "' style='"
+			+ "height:" + this.config.socket.height + "px;width:" + this.config.socket.width + "px;'/>";
+		return socketDiv;
 	},
 
 	appendLabels: function(floorplan) {
