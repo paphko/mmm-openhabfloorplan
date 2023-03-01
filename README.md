@@ -1,5 +1,5 @@
 # Magic Mirror Module: mmm-openhabfloorplan
-This [MagicMirror2](https://github.com/MichMich/MagicMirror) module allows you to show a floorplan of your house / apartment with the current state of lights, window contacts, and labels provided by a running [openhab](http://www.openhab.org/) server (working with openHAB 1.x and 2.x).
+This [MagicMirror2](https://github.com/MichMich/MagicMirror) module allows you to show a floorplan of your house / apartment with the current state of lights, window contacts, and labels provided by a running [openhab](http://www.openhab.org/) server (working with openHAB 1.x, 2.x and 3.x).
 Unlike most other modules, the data can be pushed from the openhab server via http requests to the magic mirror, so state changes are immediately shown.
 
 ![Example floorplan](https://forum.magicmirror.builders/uploads/files/1473878353822-openhabfloorplan-running.png "Example floorplan")
@@ -40,7 +40,7 @@ modules: [
 				url: "http://openhab:8080", // must not have a trailing slash!
 				// user: "", // only if you have authentication enabled
 				// password: "", // only if you have authentication enabled
-				version: 2, // supported are versions 1 and 2
+				version: 2, // supported are versions 1 and 2 (works also fine for openHAB 3)
 			},
 			floorplan: {
 				image: "floorplan-default.png", // image in subfolder 'images'; change to floorplan.png to avoid git repository changes
