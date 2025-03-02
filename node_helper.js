@@ -1,4 +1,4 @@
-const request = require("request");
+const axios = require("axios");
 const NodeHelper = require("node_helper");
 const url = require("url");
 
@@ -31,14 +31,13 @@ module.exports = NodeHelper.create({
 
 			var self = this;
 			// console.log("Requesting items on openhab server: " + JSON.stringify(requestParams));
-			request(requestParams, function(error, response, body) {
-				// console.log("response received: " + JSON.stringify(response));
-				if (!error && response.statusCode === 200) {
-					self.sendSocketNotification("OPENHAB_ITEMS", JSON.parse(body));
-				} else {
-					console.log("Request on openhab server failed (" + JSON.stringify(response) + "): " + error);
-				}
-			});
+			axios(requestParams)
+				.then(function(response) {
+					self.sendSocketNotification("OPENHAB_ITEMS", response.data);
+				})
+				.catch(function(error) {
+					console.log("Request on openhab server failed: " + error);
+				});
 		} else {
 			console.log("Unknown notification: " + notification);
 		}
